@@ -1,0 +1,6 @@
+openapi: "3.0.1"
+info:
+  title: virtual currency
+  version: 1.0.0
+  description: |
+    an API that allows users to send virtual currency to each other.
