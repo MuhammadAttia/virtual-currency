@@ -73,6 +73,25 @@ components:
         email:
           type: string
           format: email
+        walletDetails:
+          $ref: '#/components/schemas/WalletDetails'
+    WalletDetails:
+      type: object
+      properties:
+        fund:
+          type: number
+        walletId:
+          type: string
+
+    BeneficiaryDetails:
+      type: object
+      properties:
+        userId:
+          type: string
+        walletId:
+          type: string
+        amount:
+          type: number
 
     ErrorDetails:
       type: object

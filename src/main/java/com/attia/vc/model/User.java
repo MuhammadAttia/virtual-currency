@@ -3,16 +3,19 @@ package com.attia.vc.model;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
 @Table(name = "VC_USER")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements Serializable {
+public class    User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -35,7 +38,8 @@ public class User implements Serializable {
     @Column(name = "UUID")
     private String uuid;
 
-
+    @OneToOne
+    private Wallet wallet;
     public User() {
     }
 
@@ -84,6 +88,9 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public Wallet getWallet() {
+        return wallet;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -101,4 +108,7 @@ public class User implements Serializable {
         this.uuid = uuid;
     }
 
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
 }
