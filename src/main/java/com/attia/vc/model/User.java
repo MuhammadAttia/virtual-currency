@@ -13,7 +13,7 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "VC_USER")
+@Table(name = "VC_USER", uniqueConstraints={@UniqueConstraint(columnNames={"USERNAME", "EMAIL"})})
 @EntityListeners(AuditingEntityListener.class)
 public class    User implements Serializable {
     @Id
@@ -40,6 +40,11 @@ public class    User implements Serializable {
 
     @OneToOne
     private Wallet wallet;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Set<UserHasTransaction> userHasTransaction = new HashSet<>();
+
     public User() {
     }
 
@@ -110,5 +115,13 @@ public class    User implements Serializable {
 
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
+    }
+
+    public Set<UserHasTransaction> getUserHasTransaction() {
+        return userHasTransaction;
+    }
+
+    public void setUserHasTransaction(Set<UserHasTransaction> bookPublishers) {
+        this.userHasTransaction = bookPublishers;
     }
 }

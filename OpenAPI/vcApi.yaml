@@ -36,6 +36,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Find all transaction by User ID
+      description: |
+        For each user retrieve a list of VC transactions where they can see who they’ve sent and received money from.
+      operationId: getTransactionsByUserId
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transactions'
+        '400':
+          description: Invalid user Id
+        '401':
+          description: Un Authorized
+        '404':
+          description: transactions not found
 
 
 components:
@@ -92,6 +121,28 @@ components:
           type: string
         amount:
           type: number
+    Transactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionResponse'
+
+    TransactionResponse:
+      type: object
+      description: represents Transaction object
+      properties:
+        ref:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        amount:
+          type: string
+        created_at:
+          type: string
+          format: datetime
+        tranactionType:
+          type: string
 
     ErrorDetails:
       type: object
