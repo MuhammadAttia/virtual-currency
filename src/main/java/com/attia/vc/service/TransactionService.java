@@ -1,6 +1,7 @@
 package com.attia.vc.service;
 
 
+import com.attia.vc.exception.ApiException;
 import com.attia.vc.exception.BadRequestException;
 import com.attia.vc.exception.NotFoundException;
 import com.attia.vc.mapper.TransactionMapper;
@@ -26,10 +27,11 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
     private final UserHasTransactionRepository userHasTransactionRepository;
     private final WalletService walletService;
+
     public TransactionService(UserRepository userRepository, TransactionMapper transactionMapper, TransactionRepository transactionRepository, UserHasTransactionRepository userHasTransactionRepository, WalletService walletService) {
-        this.userRepository=userRepository;
-        this.transactionMapper=transactionMapper;
-        this.transactionRepository=transactionRepository;
+        this.userRepository = userRepository;
+        this.transactionMapper = transactionMapper;
+        this.transactionRepository = transactionRepository;
         this.userHasTransactionRepository = userHasTransactionRepository;
         this.walletService = walletService;
     }
@@ -37,7 +39,7 @@ public class TransactionService {
 
     public List<TransactionResponse> getTransactionByUserUUID(String userUUID) {
 
-      Optional<User> usr = userRepository.findByUuid(userUUID);
+        Optional<User> usr = userRepository.findByUuid(userUUID);
         if (usr.isPresent()) {
             User user = usr.get();
             Set<UserHasTransaction> userHasTransaction = user.getUserHasTransaction();
@@ -53,55 +55,66 @@ public class TransactionService {
     @Transactional
     public List<TransactionResponseStatus> createTransaction(UUID userUUID, List<BeneficiaryDetails> beneficiaryDetails) {
         validateListSize(beneficiaryDetails.size());
-        Optional<User> byUuid = userRepository.findByUuid(userUUID.toString());
-        if (byUuid.isPresent()) {
-            User user = byUuid.get();
-            validateTotalFund(user, beneficiaryDetails);
-            List<TransactionResponseStatus> transactionResponseStatusList = new ArrayList<>();
-            beneficiaryDetails.forEach(benefData -> {
 
-                Optional<User> beneficiaryOptional = userRepository.findByUuid(benefData.getUserId());
-                TransactionResponseStatus transactionResponseStatus = new TransactionResponseStatus();
-                if (beneficiaryOptional.isPresent()) {
-                    User beneficiary = beneficiaryOptional.get();
-                    if (!user.getUuid().equals(beneficiary.getUuid())) {
-                        if (beneficiary.getWallet().getUUID().equals(benefData.getWalletId())) {
+        User user = getUserById(userUUID.toString());
 
-                            if (benefData.getAmount().signum() == 1) {
-                                Transaction transaction = createTransaction(user, benefData, beneficiary);
+        validateTotalFund(user, beneficiaryDetails);
 
-                                addTransactionToUser(user, transaction, TransactionType.SEND);
+        List<TransactionResponseStatus> transactionResponseStatusList = new ArrayList<>();
+        beneficiaryDetails.forEach(benefData -> {
+            TransactionResponseStatus transactionResponseStatus = new TransactionResponseStatus();
 
-                                addTransactionToUser(beneficiary, transaction, TransactionType.RECEIVE);
-                                transactionResponseStatus = transactionMapper.mapTransactionToTransactionResponseStatus(transaction, TransactionResponseStatus.TransactionStatusEnum.CREATED);
-                            }else {
-                                transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
-                                        .errorReason("Amount must be Positive Number")
-                                        .to(benefData.getUserId())
-                                        .amount(benefData.getAmount().toString());
-                            }
+            try {
+                User beneficiary = getUserById(benefData.getUserId());
 
-                        } else {
-                            transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
-                                    .errorReason("Beneficiary Wallet does not match")
-                                    .to(benefData.getUserId());
-                        }
-                    } else {
-                        transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
-                                .errorReason("User can not be the same as Beneficiary")
-                                .to(benefData.getUserId());
-                    }
-                } else {
+                validateUserIsNotBeneficiary(user, beneficiary);
+
+                validateBeneficiaryData(beneficiary, benefData);
+
+                Transaction transaction = createTransaction(user, benefData, beneficiary);
+
+                addTransactionToUser(user, transaction, TransactionType.SEND);
+
+                addTransactionToUser(beneficiary, transaction, TransactionType.RECEIVE);
+
+                transactionResponseStatus = transactionMapper.mapTransactionToTransactionResponseStatus(transaction, TransactionResponseStatus.TransactionStatusEnum.CREATED);
+
+            } catch (Exception e) {
+                if (e instanceof ApiException) {
                     transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
-                            .errorReason("Beneficiary User ID not found")
+                            .errorReason(e.getMessage())
                             .to(benefData.getUserId());
-                }
-                transactionResponseStatusList.add(transactionResponseStatus);
-            });
+                } else {
 
-            return transactionResponseStatusList;
+                    throw e;
+                }
+            }
+
+            transactionResponseStatusList.add(transactionResponseStatus);
+        });
+
+        return transactionResponseStatusList;
+
+    }
+
+    private void validateBeneficiaryData(User beneficiary, BeneficiaryDetails benefData) {
+        if (!beneficiary.getWallet().getUUID().equals(benefData.getWalletId())) {
+            throw new BadRequestException("Beneficiary Wallet does not match");
         }
-        throw new NotFoundException(String.format("user '%s' does not exist", userUUID));
+
+        if (benefData.getAmount().signum() != 1) {
+            throw new BadRequestException("Amount must be Positive Number");
+        }
+    }
+
+    private void validateUserIsNotBeneficiary(User user, User beneficiary) {
+        if (user.getUuid().equals(beneficiary.getUuid())) {
+            throw new BadRequestException("User can not be the same as Beneficiary");
+        }
+    }
+
+    private User getUserById(String userID) {
+        return userRepository.findByUuid(userID).orElseThrow(() -> new NotFoundException(String.format("user '%s' does not exist", userID)));
     }
 
     private void validateListSize(int size) {
