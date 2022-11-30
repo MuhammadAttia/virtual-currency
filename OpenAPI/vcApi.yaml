@@ -65,6 +65,43 @@ paths:
           description: Un Authorized
         '404':
           description: transactions not found
+    post:
+            summary: create transaction
+            operationId: createTransaction
+            parameters:
+              - name: userId
+                in: header
+                description: User Id
+                required: true
+                schema:
+                  type: string
+                  format: UUID
+            requestBody:
+              required: true
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/TransactionRequest'
+
+            responses:
+              '200':
+                description: OK
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/TransactionResponseStatusList'
+              '400':
+                description: Bad Request
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/ErrorDetails'
+              '500':
+                description: Internal Server Error
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/ErrorDetails'
 
 
 components:
@@ -142,6 +179,22 @@ components:
           type: string
           format: datetime
         tranactionType:
+          type: string
+    TransactionResponseStatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionResponseStatus'
+
+    TransactionResponseStatus:
+      allOf:
+        - $ref: '#/components/schemas/TransactionResponse'
+      properties:
+        transactionStatus:
+          type: string
+          enum:
+            - CREATED
+            - ERROR
+        errorReason:
           type: string
 
     ErrorDetails:
