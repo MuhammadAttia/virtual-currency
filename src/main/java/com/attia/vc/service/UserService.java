@@ -1,6 +1,7 @@
 package com.attia.vc.service;
 
 
+import com.attia.vc.exception.BadRequestException;
 import com.attia.vc.mapper.UserMapper;
 import com.attia.vc.model.User;
 import com.attia.vc.repository.UserRepository;
@@ -10,6 +11,7 @@ import org.openapitools.model.UserResponse;
 import org.openapitools.model.WalletDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -29,8 +31,12 @@ public class UserService {
 
 
     public UserResponse addUser(UserRequest userRequest) {
+        validateUserRequestData(userRequest);
         Optional<User> byUsername = userRepository.findByUsername(userRequest.getUsername());
         if (byUsername.isEmpty()) {
+            if(userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+                throw new BadRequestException(String.format("Email: '%s' is already Exist please choose another one", userRequest.getEmail()));
+            }
             User user = new User(userRequest.getUsername(),userRequest.getEmail(),bcryptEncoder.encode(userRequest.getPassword()), Util.generateUUID());
             user = userRepository.save(user);
             WalletDetails walletDetails = walletService.createWallet(user);
@@ -38,6 +44,13 @@ public class UserService {
             userResponse.setWalletDetails(walletDetails);
             return userResponse;
         }
-        return null;
+        throw new BadRequestException(String.format("this username: '%s' is already Exist please choose another one", userRequest.getUsername()));
+
+    }
+
+    private void validateUserRequestData(UserRequest userRequest) {
+        if(StringUtils.isEmpty(userRequest.getEmail()) || StringUtils.isEmpty(userRequest.getUsername()) || StringUtils.isEmpty(userRequest.getPassword())) {
+            throw new BadRequestException("Username, Password and Email must not be empty");
+        }
     }
 }

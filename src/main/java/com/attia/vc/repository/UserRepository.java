@@ -8,7 +8,8 @@ import java.util.Optional;
 
 
 @Repository
-public  interface UserRepository extends CrudRepository<com.attia.vc.model.User, Long> {
+public  interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByUuid(String UUID);
     Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 }

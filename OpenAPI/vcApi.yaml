@@ -66,42 +66,42 @@ paths:
         '404':
           description: transactions not found
     post:
-            summary: create transaction
-            operationId: createTransaction
-            parameters:
-              - name: userId
-                in: header
-                description: User Id
-                required: true
-                schema:
-                  type: string
-                  format: UUID
-            requestBody:
-              required: true
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/TransactionRequest'
+      summary: create transaction
+      operationId: createTransaction
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
 
-            responses:
-              '200':
-                description: OK
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/TransactionResponseStatusList'
-              '400':
-                description: Bad Request
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/ErrorDetails'
-              '500':
-                description: Internal Server Error
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/ErrorDetails'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseStatusList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
 
 
 components:
@@ -112,6 +112,18 @@ components:
       maxItems: 10
       items:
         $ref: '#/components/schemas/BeneficiaryDetails'
+
+    BeneficiaryDetails:
+      type: object
+      properties:
+        userId:
+          type: string
+        walletId:
+          type: string
+        amount:
+          type: number
+
+
     UserRequest:
       type: object
       required:
@@ -141,6 +153,7 @@ components:
           format: email
         walletDetails:
           $ref: '#/components/schemas/WalletDetails'
+
     WalletDetails:
       type: object
       properties:
@@ -149,15 +162,6 @@ components:
         walletId:
           type: string
 
-    BeneficiaryDetails:
-      type: object
-      properties:
-        userId:
-          type: string
-        walletId:
-          type: string
-        amount:
-          type: number
     Transactions:
       type: array
       items:

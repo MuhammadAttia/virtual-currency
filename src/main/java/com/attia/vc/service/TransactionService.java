@@ -1,5 +1,8 @@
 package com.attia.vc.service;
 
+
+import com.attia.vc.exception.BadRequestException;
+import com.attia.vc.exception.NotFoundException;
 import com.attia.vc.mapper.TransactionMapper;
 import com.attia.vc.model.*;
 import com.attia.vc.repository.TransactionRepository;
@@ -12,6 +15,7 @@ import org.openapitools.model.TransactionResponseStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,14 +47,16 @@ public class TransactionService {
                 return transactionResponse;
             }).collect(Collectors.toList());
         }
-        return Collections.emptyList();
+        throw new NotFoundException(String.format("user '%s' does not exist", userUUID));
     }
 
     @Transactional
     public List<TransactionResponseStatus> createTransaction(UUID userUUID, List<BeneficiaryDetails> beneficiaryDetails) {
+        validateListSize(beneficiaryDetails.size());
         Optional<User> byUuid = userRepository.findByUuid(userUUID.toString());
         if (byUuid.isPresent()) {
             User user = byUuid.get();
+            validateTotalFund(user, beneficiaryDetails);
             List<TransactionResponseStatus> transactionResponseStatusList = new ArrayList<>();
             beneficiaryDetails.forEach(benefData -> {
 
@@ -95,9 +101,21 @@ public class TransactionService {
 
             return transactionResponseStatusList;
         }
-        return null;
+        throw new NotFoundException(String.format("user '%s' does not exist", userUUID));
     }
 
+    private void validateListSize(int size) {
+        if (size < 1 || size > 10) {
+            throw new BadRequestException("List size must be from 1 to 10");
+        }
+    }
+
+    private void validateTotalFund(User user, List<BeneficiaryDetails> beneficiaryDetails) {
+        BigDecimal totalBenefListAmount = beneficiaryDetails.stream().map(BeneficiaryDetails::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (user.getWallet().getFund().compareTo(totalBenefListAmount) < 0) {
+            throw new BadRequestException("Insufficient Fund. total amount must be less than or equal to Wallet Amount");
+        }
+    }
 
     private void addTransactionToUser(User user, Transaction transaction, TransactionType transactionType) {
         UserHasTransaction senderHasTransaction = new UserHasTransaction();
