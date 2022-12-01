@@ -42,7 +42,7 @@ public class WalletService {
         return walletMapper.mapWalletDAOTOWalletDetails(wallet);
     }
 
-    public void updateWallet(Wallet wallet) {
+    void updateWallet(Wallet wallet) {
         walletRepository.save(wallet);
     }
 }
