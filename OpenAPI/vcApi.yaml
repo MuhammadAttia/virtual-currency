@@ -1,0 +1,263 @@
+openapi: "3.0.1"
+info:
+  title: virtual currency
+  version: 1.0.0
+  description: |
+    Application that allows users to send / receive virtual currency.
+
+paths:
+  /users:
+    post:
+      summary: add user with default wallet
+      operationId: addUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+
+      responses:
+        '201':
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    get:
+      summary: get user ( for testing purpose )
+      operationId: getUser
+      tags:
+        - users
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Find all transaction for specfic user
+      description: |
+        For each user retrieve a list of VC transactions where they can see who they’ve sent and received money from.
+      operationId: getTransactionsByUserId
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transactions'
+        '400':
+          description: Invalid user Id
+        '401':
+          description: Un Authorized
+        '404':
+          description: transactions not found
+    post:
+      summary: |
+        create transaction to send any amount of VC to users.
+      operationId: createTransaction
+      tags:
+        - transactions
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseStatusList'
+        '207':
+          description: Multi-Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseStatusList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+
+
+components:
+  schemas:
+    TransactionRequest:
+      type: array
+      minItems: 1
+      maxItems: 10
+      items:
+        $ref: '#/components/schemas/BeneficiaryDetails'
+
+    BeneficiaryDetails:
+      type: object
+      properties:
+        userId:
+          type: string
+        walletId:
+          type: string
+        amount:
+          type: number
+
+
+    UserRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        walletDetails:
+          $ref: '#/components/schemas/WalletDetails'
+
+    WalletDetails:
+      type: object
+      properties:
+        fund:
+          type: number
+        walletId:
+          type: string
+
+    Transactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionResponse'
+
+    TransactionResponse:
+      type: object
+      description: represents Transaction object
+      properties:
+        ref:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        amount:
+          type: string
+        created_at:
+          type: string
+          format: datetime
+        tranactionType:
+          type: string
+    TransactionResponseStatusList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionResponseStatus'
+
+    TransactionResponseStatus:
+      allOf:
+        - $ref: '#/components/schemas/TransactionResponse'
+      properties:
+        transactionStatus:
+          type: string
+          enum:
+            - CREATED
+            - ERROR
+        errorReason:
+          type: string
+
+    ErrorDetails:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        date:
+          type: string
+          format: datetime
+        status:
+          type: string
+        error:
+          type: string
+        uri:
+          type: string
+        message:
+          type: string
