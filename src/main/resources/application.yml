@@ -1,17 +1,13 @@
 server:
   port: 8888
 spring:
-  sql:
-    init:
-      mode: always
   datasource:
     url: jdbc:mysql://localhost:3306/vc_db?createDatabaseIfNotExist=true&useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&character_set_server=UTF-8
     username: admin
     password: admin
-
+    initialization-mode: always
   jpa:
     show-sql: false
-    defer-datasource-initialization: true
     # Allows Hibernate to generate SQL optimized for a particular DBMS
     properties:
       hibernate:
