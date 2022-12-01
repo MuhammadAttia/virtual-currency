@@ -17,7 +17,8 @@ public class TransactionMapper {
     public TransactionResponseStatus mapTransactionToTransactionResponseStatus(Transaction transaction, TransactionResponseStatus.TransactionStatusEnum transactionStatusEnum) {
         TransactionResponseStatus transactionResponse= new TransactionResponseStatus();
         transactionResponse.ref(transaction.getReferenceNumber()).amount(String.valueOf(transaction.getAmount()))
-                .from(transaction.getSenderUUID()).to(transaction.getReceiverUUID())
+                .from(transaction.getSenderUUID()).to(transaction.getReceiverUUID()).createdAt(transaction.getCreatedAt().toString())
+                .createdAt(transaction.getCreatedAt().toString())
                 .transactionStatus(transactionStatusEnum);
         return transactionResponse;
     }

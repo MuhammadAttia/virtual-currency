@@ -5,7 +5,6 @@ import com.attia.vc.model.User;
 import com.attia.vc.model.Wallet;
 import com.attia.vc.repository.UserRepository;
 import com.attia.vc.repository.WalletRepository;
-import com.attia.vc.util.Util;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,9 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.openapitools.model.WalletDetails;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;

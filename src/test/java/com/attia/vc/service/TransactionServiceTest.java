@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TransactionServiceTest {
+ class TransactionServiceTest {
 
     @Mock
     private UserRepository userRepository;

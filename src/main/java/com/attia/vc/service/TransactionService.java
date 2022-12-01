@@ -9,7 +9,7 @@ import com.attia.vc.model.*;
 import com.attia.vc.repository.TransactionRepository;
 import com.attia.vc.repository.UserHasTransactionRepository;
 import com.attia.vc.repository.UserRepository;
-import com.attia.vc.util.Util;
+import com.attia.vc.util.UUIDUtil;
 import org.openapitools.model.BeneficiaryDetails;
 import org.openapitools.model.TransactionResponse;
 import org.openapitools.model.TransactionResponseStatus;
@@ -133,7 +133,7 @@ public class TransactionService {
         transaction.setAmount(benefData.getAmount());
         transaction.setSenderUUID(user.getUuid());
         transaction.setReceiverUUID(beneficiary.getUuid());
-        transaction.setReferenceNumber(Util.generateUUID());
+        transaction.setReferenceNumber(UUIDUtil.generateUUID());
 
         transaction = transactionRepository.save(transaction);
 

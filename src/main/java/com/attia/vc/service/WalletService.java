@@ -6,7 +6,7 @@ import com.attia.vc.model.User;
 import com.attia.vc.model.Wallet;
 import com.attia.vc.repository.UserRepository;
 import com.attia.vc.repository.WalletRepository;
-import com.attia.vc.util.Util;
+import com.attia.vc.util.UUIDUtil;
 import org.openapitools.model.WalletDetails;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class WalletService {
         Wallet wallet = new Wallet();
         wallet.setFund(BigDecimal.ZERO);
         wallet.setUser(user);
-        wallet.setUUID(Util.generateUUID());
+        wallet.setUUID(UUIDUtil.generateUUID());
         wallet.setLastAccrueDate(LocalDateTime.now());
 
         wallet = walletRepository.save(wallet);

@@ -4,7 +4,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -14,7 +13,7 @@ import java.util.Set;
 @Entity
 @Table(name = "VC_TRANSACTION")
 @EntityListeners(AuditingEntityListener.class)
-public class Transaction implements Serializable {
+public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

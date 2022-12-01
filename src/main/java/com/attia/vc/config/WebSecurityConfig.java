@@ -15,18 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public static final String[] PUBLIC_MATCHERS = {"/auth/login",
-            "/auth/register",
-            "/time-zones",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-    };
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                //.antMatchers(PUBLIC_MATCHERS).permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling().and()
