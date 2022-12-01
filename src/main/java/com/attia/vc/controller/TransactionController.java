@@ -8,6 +8,7 @@ import org.openapitools.model.TransactionResponse;
 import org.openapitools.model.TransactionResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -32,8 +33,15 @@ public class TransactionController implements TransactionsApi {
     @Override
     public ResponseEntity<List<TransactionResponseStatus>> createTransaction(UUID userUUID, @Valid List<BeneficiaryDetails> beneficiaryDetails) {
         List<TransactionResponseStatus> transaction = transactionService.createTransaction(userUUID, beneficiaryDetails);
-        return ResponseEntity.status((HttpStatus.OK)).body(transaction);
+        return ResponseEntity.status(getHttpResponseFromResult(transaction)).body(transaction);
     }
 
-
+    private HttpStatus getHttpResponseFromResult(List<TransactionResponseStatus> transaction) {
+        if(CollectionUtils.isEmpty(transaction) || transaction.stream().allMatch(transactionResponseStatus -> TransactionResponseStatus.TransactionStatusEnum.CREATED.equals(transactionResponseStatus.getTransactionStatus()))) {
+            return HttpStatus.OK;
+        }else if (transaction.stream().allMatch(transactionResponseStatus -> TransactionResponseStatus.TransactionStatusEnum.ERROR.equals(transactionResponseStatus.getTransactionStatus()))) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        return HttpStatus.MULTI_STATUS;
+    }
 }

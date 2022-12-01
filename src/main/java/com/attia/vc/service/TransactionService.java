@@ -66,30 +66,18 @@ public class TransactionService {
 
             try {
                 User beneficiary = getUserById(benefData.getUserId());
-
                 validateUserIsNotBeneficiary(user, beneficiary);
-
                 validateBeneficiaryData(beneficiary, benefData);
-
                 Transaction transaction = createTransaction(user, benefData, beneficiary);
-
                 addTransactionToUser(user, transaction, TransactionType.SEND);
-
                 addTransactionToUser(beneficiary, transaction, TransactionType.RECEIVE);
-
                 transactionResponseStatus = transactionMapper.mapTransactionToTransactionResponseStatus(transaction, TransactionResponseStatus.TransactionStatusEnum.CREATED);
 
-            } catch (Exception e) {
-                if (e instanceof ApiException) {
-                    transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
-                            .errorReason(e.getMessage())
-                            .to(benefData.getUserId());
-                } else {
-
-                    throw e;
-                }
+            } catch (ApiException e) {
+                transactionResponseStatus.transactionStatus(TransactionResponseStatus.TransactionStatusEnum.ERROR)
+                        .errorReason(e.getMessage())
+                        .to(benefData.getUserId());
             }
-
             transactionResponseStatusList.add(transactionResponseStatus);
         });
 

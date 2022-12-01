@@ -37,7 +37,7 @@ public class WalletService {
         wallet = walletRepository.save(wallet);
 
         user.setWallet(wallet);
-        user = userRepository.save(user);
+        userRepository.save(user);
 
         return walletMapper.mapWalletDAOTOWalletDetails(wallet);
     }
