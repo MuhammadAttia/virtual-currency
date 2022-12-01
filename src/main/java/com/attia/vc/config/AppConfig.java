@@ -2,6 +2,8 @@ package com.attia.vc.config;
 
 import com.attia.vc.model.Wallet;
 import com.attia.vc.repository.WalletRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 @EnableScheduling
 public class AppConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AppConfig.class);
     private final WalletRepository walletRepository;
 
     public AppConfig(WalletRepository walletRepository) {
@@ -23,7 +26,7 @@ public class AppConfig {
     @Scheduled(cron = "2 * * * * *") // for testing purposes every 1 minute
     // "0 0/30 * * * ?" for every 30 minutes
     public void updateWalletFund() {
-        System.out.println("test: " + LocalDateTime.now());
+        LOG.info("update fund schedule is started : {} ",LocalDateTime.now());
         Iterable<Wallet> allWallets = walletRepository.findAll();
         allWallets.forEach(wallet -> {
             LocalDateTime now = LocalDateTime.now();
@@ -35,6 +38,7 @@ public class AppConfig {
                 walletRepository.save(wallet);
             }
         });
+        LOG.info("update fund schedule is finished : {}" ,LocalDateTime.now());
     }
 
 }
