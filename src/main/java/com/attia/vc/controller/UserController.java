@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 public class UserController implements UsersApi {
 
@@ -22,5 +24,11 @@ public class UserController implements UsersApi {
     public ResponseEntity<UserResponse> addUser(UserRequest userRequest) {
         UserResponse userResponse = userService.addUser(userRequest);
         return  ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> getUser(UUID userId) {
+        UserResponse userResponse = userService.getUser(userId);
+        return  ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
 }

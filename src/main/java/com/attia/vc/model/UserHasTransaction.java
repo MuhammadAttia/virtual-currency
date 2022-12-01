@@ -2,10 +2,11 @@ package com.attia.vc.model;
 
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "VC_USER_HAS_TRANSACTION")
-public class UserHasTransaction {
+public class UserHasTransaction implements Serializable {
 
     @EmbeddedId
     private UserHasTransactionId id = new UserHasTransactionId();

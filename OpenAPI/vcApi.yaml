@@ -3,13 +3,15 @@ info:
   title: virtual currency
   version: 1.0.0
   description: |
-    an API that allows users to send virtual currency to each other.
+    Application that allows users to send / receive virtual currency.
 
 paths:
   /users:
     post:
-      summary: add users to VC App
+      summary: add user with default wallet
       operationId: addUser
+      tags:
+        - users
       requestBody:
         required: true
         content:
@@ -36,11 +38,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+    get:
+      summary: get user ( for testing purpose )
+      operationId: getUser
+      tags:
+        - users
+      parameters:
+        - name: userId
+          in: header
+          description: User Id
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: SUCCESS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /transactions:
     get:
       tags:
         - transactions
-      summary: Find all transaction by User ID
+      summary: Find all transaction for specfic user
       description: |
         For each user retrieve a list of VC transactions where they can see who they’ve sent and received money from.
       operationId: getTransactionsByUserId
@@ -66,8 +100,11 @@ paths:
         '404':
           description: transactions not found
     post:
-      summary: create transaction
+      summary: |
+        create transaction to send any amount of VC to users.
       operationId: createTransaction
+      tags:
+        - transactions
       parameters:
         - name: userId
           in: header
@@ -86,6 +123,12 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponseStatusList'
+        '207':
+          description: Multi-Status
           content:
             application/json:
               schema:

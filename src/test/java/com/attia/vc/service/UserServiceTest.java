@@ -4,7 +4,7 @@ import com.attia.vc.exception.BadRequestException;
 import com.attia.vc.mapper.UserMapper;
 import com.attia.vc.model.User;
 import com.attia.vc.repository.UserRepository;
-import com.attia.vc.util.Util;
+import com.attia.vc.util.UUIDUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,7 +49,7 @@ class UserServiceTest {
         userRequest.username("attia").email("muhammad.mattia@gmail.com").password("123");
         when(bcryptEncoder.encode(any(String.class))).thenReturn(any(String.class));
 
-        User user = new User(userRequest.getUsername(),userRequest.getEmail(),userRequest.getPassword(), Util.generateUUID());
+        User user = new User(userRequest.getUsername(),userRequest.getEmail(),userRequest.getPassword(), UUIDUtil.generateUUID());
         when(userRepository.findByUsername(userRequest.getUsername())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(userRequest.getUsername())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).then(returnsFirstArg());
@@ -77,7 +77,7 @@ class UserServiceTest {
         UserRequest userRequest = new UserRequest();
         userRequest.username("attia").email("muhammad.mattia@gmail.com").password("123");
         when(bcryptEncoder.encode(any(String.class))).thenReturn(any(String.class));
-        User user = new User(userRequest.getUsername(),userRequest.getEmail(),userRequest.getPassword(), Util.generateUUID());
+        User user = new User(userRequest.getUsername(),userRequest.getEmail(),userRequest.getPassword(), UUIDUtil.generateUUID());
 
         when(userRepository.findByUsername(userRequest.getUsername())).thenReturn(Optional.of(user));
 

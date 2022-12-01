@@ -2,12 +2,13 @@ package com.attia.vc.model;
 
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "VC_WALLET")
-public class Wallet {
+public class Wallet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

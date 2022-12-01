@@ -2,7 +2,7 @@ package com.attia.vc.util;
 
 import java.util.UUID;
 
-public class Util {
+public class UUIDUtil {
     public static String generateUUID() {
         return UUID.randomUUID().toString();
     }

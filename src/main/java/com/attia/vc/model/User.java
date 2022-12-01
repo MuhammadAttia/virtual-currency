@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "VC_USER", uniqueConstraints={@UniqueConstraint(columnNames={"USERNAME", "EMAIL"})})
 @EntityListeners(AuditingEntityListener.class)
-public class    User implements Serializable {
+public class  User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -38,7 +38,7 @@ public class    User implements Serializable {
     @Column(name = "UUID")
     private String uuid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Wallet wallet;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
