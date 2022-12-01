@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.attia</groupId>
     <artifactId>virtual-currency</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Virtual Currency</name>
     <description>Virtual Currency</description>
     <properties>
